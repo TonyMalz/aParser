@@ -30,10 +30,12 @@ public class Lox {
 
 		for (;;) {
 			System.out.print("> ");
-			run(reader.readLine());
+			// reset error flag for new evaluation
 			hadError = false;
+			String line = reader.readLine().trim();
+			if (line.equals(":q") || line.equals("exit")) return;
+			run(line);
 		}
-
 	}
 
 	private static void runFile(String path) throws IOException {

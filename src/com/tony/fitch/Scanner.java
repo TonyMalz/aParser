@@ -1,11 +1,12 @@
-package com.tony.lox;
+package com.tony.fitch;
 
-import static com.tony.lox.TokenType.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.tony.fitch.TokenType.*;
 
 public class Scanner {
 	private final String source;
@@ -19,21 +20,12 @@ public class Scanner {
 	static {
 		keywords = new HashMap<>();
 		keywords.put("and", AND);
-		keywords.put("class", CLASS);
-		keywords.put("else", ELSE);
-		keywords.put("false", FALSE);
-		keywords.put("for", FOR);
-		keywords.put("fun", FUN);
-		keywords.put("if", IF);
-		keywords.put("nil", NIL);
 		keywords.put("or", OR);
-		keywords.put("print", PRINT);
-		keywords.put("return", RETURN);
-		keywords.put("super", SUPER);
-		keywords.put("this", THIS);
-		keywords.put("true", TRUE);
-		keywords.put("var", VAR);
-		keywords.put("while", WHILE);
+		keywords.put("not", NOT);
+		keywords.put("A", FOR_ALL);
+		keywords.put("E", EXISTS);
+		keywords.put("BOT", BOTTOM);
+		keywords.put("F", BOTTOM);
 	}
 
 	Scanner(String source) {
@@ -64,20 +56,11 @@ public class Scanner {
 			case ')' :
 				addToken(RIGHT_PAREN);
 				break;
-			case '{' :
-				addToken(LEFT_BRACE);
-				break;
-			case '}' :
-				addToken(RIGHT_BRACE);
-				break;
 			case ',' :
 				addToken(COMMA);
 				break;
-			case '.' :
-				addToken(DOT);
-				break;
 			case '-' :
-				addToken(MINUS);
+				addToken(match('>') ? IMPL : MINUS);
 				break;
 			case '+' :
 				addToken(PLUS);
@@ -89,13 +72,21 @@ public class Scanner {
 				addToken(STAR);
 				break;
 			case '!' :
-				addToken(match('=') ? BANG_EQUAL : BANG);
+				addToken(NOT);
 				break;
 			case '=' :
-				addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+				addToken(match('>') ? IMPL : EQUAL);
 				break;
 			case '<' :
-				addToken(match('=') ? LESS_EQUAL : LESS);
+				if (match('=')) {
+					if (match('>'))
+						addToken(BI_IMPL);
+					else
+						addToken(LESS_EQUAL);
+				} else if (match('-') && match('>') )
+					addToken(BI_IMPL);
+				else
+					addToken(LESS);
 				break;
 			case '>' :
 				addToken(match('=') ? GREATER_EQUAL : GREATER);
@@ -119,9 +110,6 @@ public class Scanner {
 			case '\n' :
 				line++;
 				break;
-			case '"' :
-				string();
-				break;
 
 			default :
 				if (isDigit(c)) {
@@ -130,7 +118,7 @@ public class Scanner {
 					identifier();
 				} else {
 					// TODO: coalesce all invalid characters?
-					Lox.error(line, "Unexpected character.");
+					Fitch.error(line, "Unexpected character.");
 				}
 				break;
 		}
@@ -176,27 +164,6 @@ public class Scanner {
 		addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
 	}
 
-	private void string() {
-		while (peek() != '"' && !isAtEnd()) {
-			if (peek() == '\n')
-				line++;
-			advance();
-		}
-
-		// Unterminated string.
-		if (isAtEnd()) {
-			Lox.error(line, "Unterminated string.");
-			return;
-		}
-
-		// The closing ".
-		advance();
-
-		// Trim the surrounding quotes.
-		String value = source.substring(start + 1, current - 1);
-		// TODO: escape sequences
-		addToken(STRING, value);
-	}
 
 	private char advance() {
 		return source.charAt(current++);
