@@ -22,10 +22,11 @@ public class Scanner {
 		keywords.put("and", AND);
 		keywords.put("or", OR);
 		keywords.put("not", NOT);
-		keywords.put("A", FOR_ALL);
-		keywords.put("E", EXISTS);
-		keywords.put("BOT", BOTTOM);
-		keywords.put("F", BOTTOM);
+		keywords.put("FA", FOR_ALL);
+		keywords.put("EX", EXISTS);
+		keywords.put("bottom", BOTTOM);
+		keywords.put("false", BOTTOM);
+		keywords.put("iff", BI_IMPL);
 	}
 
 	Scanner(String source) {
@@ -73,6 +74,33 @@ public class Scanner {
 				break;
 			case '!' :
 				addToken(NOT);
+				break;
+			case '∧' :
+				addToken(AND);
+				break;
+			case '∨' :
+				addToken(OR);
+				break;
+			case '¬' :
+				addToken(NOT);
+				break;
+			case '→' :
+				addToken(IMPL);
+				break;
+			case '∀' :
+				addToken(FOR_ALL);
+				break;
+			case '∃' :
+				addToken(EXISTS);
+				break;
+			case '⊥' :
+				addToken(BOTTOM);
+				break;
+			case '↔' :
+				addToken(BI_IMPL);
+				break;
+			case '⇔' :
+				addToken(BI_IMPL);
 				break;
 			case '=' :
 				addToken(match('>') ? IMPL : EQUAL);
