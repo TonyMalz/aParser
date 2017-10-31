@@ -65,7 +65,11 @@ public class Parser {
     }
 
     public Formula parse(){
-        return formula();
+        try {
+            return formula();
+        } catch (ParseError error) {
+            return null;
+        }
     }
 
     // parse grammar (recursive decent)
