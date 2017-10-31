@@ -5,39 +5,31 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
-public class GenerateAst {
+public class GenerateAstFitch {
 
 	public static void main(String[] args) throws IOException {
 
-		String outputDir = "./src/com/tony/lox";
+		String outputDir = "./src/com/tony/fitch";
 
-		defineAst(outputDir, "Expr", Arrays.asList(
-				"Assign   : Token name, Expr value",
-				"Binary   : Expr left, Token operator, Expr right",
-				"Grouping : Expr expression", "Literal  : Object value",
-				"Logical  : Expr left, Token operator, Expr right",
-				"Unary    : Token operator, Expr right",
-				"Variable : Token name"));
-		System.out.println("Done generating Expr classes");
+		defineAst(outputDir, "Formula", Arrays.asList(
+				"Unary    : Token operator, Formula right",
+				"Binary   : Formula left, Token connective, Formula right",
+				"Quantified : Token quantifier, Token variable, Formula right",
+				"Variable : Token name",
+				"Constant : Token name",
+				"Func : Token name, List<Formula> args"
+				)
+		);
+		System.out.println("Done generating Formula classes");
 
-		defineAst(
-				outputDir,
-				"Stmt",
-				Arrays.asList(
-						"Block      : List<Stmt> statements",
-						"Expression : Expr expression",
-						"Print      : Expr expression",
-						"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
-						"Var        : Token name, Expr initializer",
-						"While      : Expr condition, Stmt body"));
-		System.out.println("Done generating Stmt classes");
+
 	}
 	private static void defineAst(String outputDir, String baseName,
 			List<String> types) throws IOException {
 		String path = outputDir + "/" + baseName + ".java";
 		PrintWriter writer = new PrintWriter(path, "UTF-8");
 
-		writer.println("package com.tony.lox;");
+		writer.println("package com.tony.fitch;");
 		writer.println("");
 		writer.println("import java.util.List;");
 		writer.println("");

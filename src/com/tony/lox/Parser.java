@@ -162,7 +162,7 @@ public class Parser {
 		if (!check(SEMICOLON)) {
 			condition = expression();
 		}
-		consume(SEMICOLON, "Expected';' after loop condition.");
+		consume(SEMICOLON, "Expected ';' after loop condition.");
 
 		Expr increment = null;
 		if (!check(RIGHT_PAREN)) {
