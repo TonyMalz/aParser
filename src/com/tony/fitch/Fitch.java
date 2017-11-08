@@ -51,10 +51,11 @@ public class Fitch {
         List<Token> tokens = scanner.scanTokens();
 
         // For now, just print the tokens.
-        for (Token token : tokens) {
-            System.out.println(token);
-        }
-
+        //for (Token token : tokens) {
+            //System.out.println(token);
+        //}
+        Parser parser = new Parser(tokens);
+        Formula form = parser.parse();
         // Stop if there was a syntax error.
         if (hadError)
             return;

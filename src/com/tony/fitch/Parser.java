@@ -83,7 +83,7 @@ public class Parser {
 
         if (match(LEFT_PAREN)) {
             Formula left = formula();
-            if (match(IMPL, BI_IMPL, AND, OR, EQUAL)) {
+            if (match(IMPL, BI_IMPL, AND, OR )) {
                 Token connective = previous();
                 Formula right = formula();
                 left = new Formula.Binary(left, connective, right);
@@ -102,7 +102,19 @@ public class Parser {
             throw error(peek(),"Expected a variable after quantification.");
         }
 
-        return term();
+        Formula term = term();
+        if (match(EQUAL)){
+            Token connective = previous();
+            Formula right = term();
+            return new Formula.Binary(term,connective,right);
+        }
+
+        if (match(AND, OR)){
+            Token connective = previous();
+            Formula right = formula();
+            return new Formula.Binary(term, connective, right);
+        }
+        return term;
     }
 
     Formula term(){
