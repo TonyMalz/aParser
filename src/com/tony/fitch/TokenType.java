@@ -11,7 +11,7 @@ public enum TokenType {
 	IDENTIFIER, NUMBER,
 
 	// Logical tokens
-	AND, OR, NOT, BOTTOM, IMPL, BI_IMPL, FOR_ALL, EXISTS,
+	AND, OR, NOT, TRUE, FALSE, IMPL, BI_IMPL, FOR_ALL, EXISTS,
 
 	EOF
 }

@@ -24,8 +24,9 @@ public class Scanner {
 		keywords.put("not", NOT);
 		keywords.put("FA", FOR_ALL);
 		keywords.put("EX", EXISTS);
-		keywords.put("bottom", BOTTOM);
-		keywords.put("false", BOTTOM);
+		keywords.put("bottom", FALSE);
+		keywords.put("false", FALSE);
+		keywords.put("true", TRUE);
 		keywords.put("iff", BI_IMPL);
 	}
 
@@ -93,8 +94,11 @@ public class Scanner {
 			case '∃' :
 				addToken(EXISTS);
 				break;
+			case '⊤' :
+				addToken(TRUE);
+				break;
 			case '⊥' :
-				addToken(BOTTOM);
+				addToken(FALSE);
 				break;
 			case '↔' :
 				addToken(BI_IMPL);

@@ -66,27 +66,59 @@ public class Parser {
 
     public Formula parse(){
         try {
-            return formula();
+            Formula form = formula(true);
+            checkIsAtEOF();
+            return form;
         } catch (ParseError error) {
             return null;
         }
     }
 
+    void checkIsAtEOF(){
+        if(peek().type != EOF){
+            throw error(peek(), "Unexpected token");
+        }
+    }
+
     // parse grammar (recursive decent)
 
-    Formula formula() {
+    Formula formula(boolean first) {
         if (match(NOT)) {
             Token operator = previous();
-            Formula right = formula();
+            Formula right = formula(false);
             return new Formula.Unary(operator, right);
         }
 
         if (match(LEFT_PAREN)) {
-            Formula left = formula();
-            if (match(IMPL, BI_IMPL, AND, OR )) {
+            Formula left = formula(false);
+            if (match(IMPL, BI_IMPL)) {
                 Token connective = previous();
-                Formula right = formula();
+                Formula right = formula(false);
                 left = new Formula.Binary(left, connective, right);
+            }
+            if (match(AND)) {
+                List<Formula> formulas = new ArrayList<>();
+                List<Token> connectives = new ArrayList<>();
+                formulas.add(left);
+                connectives.add(previous());
+                formulas.add(formula(false));
+                while (match(AND)){
+                    connectives.add(previous());
+                    formulas.add(formula(false));
+                }
+                consume(RIGHT_PAREN, "Expected ')' after expression.");
+                return new Formula.ANDList(formulas,connectives);
+            }
+            if (match(OR)) {
+                List<Formula> formulas = new ArrayList<>();
+                List<Token> connectives = new ArrayList<>();
+                formulas.add(left);
+                formulas.add(formula(false));
+                while (match(OR)){
+                    formulas.add(formula(false));
+                }
+                consume(RIGHT_PAREN, "Expected ')' after expression.");
+                return new Formula.ORList(formulas, connectives);
             }
             consume(RIGHT_PAREN, "Expected ')' after expression.");
             return left;
@@ -96,7 +128,7 @@ public class Parser {
             Token quantifier = previous();
             if(match(IDENTIFIER)) {
                 Token variable = previous();
-                Formula right = formula();
+                Formula right = formula(false);
                 return new Formula.Quantified(quantifier, variable, right);
             }
             throw error(peek(),"Expected a variable after quantification.");
@@ -106,19 +138,45 @@ public class Parser {
         if (match(EQUAL)){
             Token connective = previous();
             Formula right = term();
-            return new Formula.Binary(term,connective,right);
+            return new Formula.Equality(term,connective,right);
         }
 
-        if (match(AND, OR)){
+        /*if (match(AND, OR)){
             Token connective = previous();
             Formula right = formula();
             return new Formula.Binary(term, connective, right);
+        }*/
+        // variable first is a hack to accommodate for the lax syntax used in tutorials:
+        // for AND and OR on the first level of the formula, parenthesis can be omitted
+        if (first) {
+            if (match(AND)) {
+                List<Formula> formulas = new ArrayList<>();
+                List<Token> connectives = new ArrayList<>();
+                formulas.add(term);
+                connectives.add(previous());
+                formulas.add(formula(false));
+                while (match(AND)){
+                    connectives.add(previous());
+                    formulas.add(formula(false));
+                }
+                return new Formula.ANDList(formulas,connectives);
+            }
+            if (match(OR)) {
+                List<Formula> formulas = new ArrayList<>();
+                List<Token> connectives = new ArrayList<>();
+                formulas.add(term);
+                formulas.add(formula(false));
+                while (match(OR)){
+                    formulas.add(formula(false));
+                }
+                return new Formula.ORList(formulas, connectives);
+            }
         }
         return term;
     }
 
     Formula term(){
-        if(match(BOTTOM,NUMBER)){
+        if(match(TRUE, FALSE, NUMBER)){
             return new Formula.Constant(previous());
         }
         if(match(IDENTIFIER)){
