@@ -5,15 +5,17 @@ public class Token {
 	final String lexeme;
 	final Object literal;
 	final int line;
+	final int pos;
 
-	Token(TokenType type, String lexeme, Object literal, int line) {
+	Token(TokenType type, String lexeme, Object literal, int line, int pos) {
 		this.type = type;
 		this.lexeme = lexeme;
 		this.literal = literal;
 		this.line = line;
+		this.pos = pos;
 	}
 
 	public String toString() {
-		return "[" + type + "] '" + lexeme + "' " + literal + " " + line;
+		return "[" + type + "] '" + lexeme + "' " + literal +" " + pos + " " + line;
 	}
 }
