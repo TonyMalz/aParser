@@ -13,11 +13,14 @@ public class GenerateAstFitch {
 
 		defineAst(outputDir, "Formula", Arrays.asList(
 				"Unary    : Token operator, Formula right",
+				"Not    : Token operator, Formula right",
 				"Binary   : Formula left, Token connective, Formula right",
+				"Impl   : Formula left, Token connective, Formula right",
+				"BIImpl   : Formula left, Token connective, Formula right",
 				"Quantified : Token quantifier, Token variable, Formula right",
 				"Equality : Formula left, Token connective, Formula right",
-				"ANDList : List<Formula> terms, List<Token> connectives",
-				"ORList  : List<Formula> terms, List<Token> connectives",
+				"And : List<Formula> terms, List<Token> connectives",
+				"Or  : List<Formula> terms, List<Token> connectives",
 				"Variable : Token name",
 				"Constant : Token name",
 				"Func : Token name, List<Formula> args"

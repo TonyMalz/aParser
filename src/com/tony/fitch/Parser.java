@@ -86,16 +86,26 @@ public class Parser {
         if (match(NOT)) {
             Token operator = previous();
             Formula right = formula(false);
-            return new Formula.Unary(operator, right);
+            return new Formula.Not(operator, right);
         }
 
         if (match(LEFT_PAREN)) {
             Formula left = formula(false);
-            if (match(IMPL, BI_IMPL)) {
+
+            if (match(IMPL )) {
                 Token connective = previous();
                 Formula right = formula(false);
-                left = new Formula.Binary(left, connective, right);
+                consume(RIGHT_PAREN, "Expected ')' after expression.");
+                return  new Formula.Impl(left, connective, right);
             }
+
+            if (match(BI_IMPL)) {
+                Token connective = previous();
+                Formula right = formula(false);
+                consume(RIGHT_PAREN, "Expected ')' after expression.");
+                return  new Formula.BIImpl(left, connective, right);
+            }
+
             if (match(AND)) {
                 List<Formula> formulas = new ArrayList<>();
                 List<Token> connectives = new ArrayList<>();
@@ -107,8 +117,9 @@ public class Parser {
                     formulas.add(formula(false));
                 }
                 consume(RIGHT_PAREN, "Expected ')' after expression.");
-                return new Formula.ANDList(formulas,connectives);
+                return new Formula.And(formulas,connectives);
             }
+
             if (match(OR)) {
                 List<Formula> formulas = new ArrayList<>();
                 List<Token> connectives = new ArrayList<>();
@@ -118,8 +129,9 @@ public class Parser {
                     formulas.add(formula(false));
                 }
                 consume(RIGHT_PAREN, "Expected ')' after expression.");
-                return new Formula.ORList(formulas, connectives);
+                return new Formula.Or(formulas, connectives);
             }
+
             consume(RIGHT_PAREN, "Expected ')' after expression.");
             return left;
         }
@@ -159,7 +171,7 @@ public class Parser {
                     connectives.add(previous());
                     formulas.add(formula(false));
                 }
-                return new Formula.ANDList(formulas,connectives);
+                return new Formula.And(formulas,connectives);
             }
             if (match(OR)) {
                 List<Formula> formulas = new ArrayList<>();
@@ -169,7 +181,7 @@ public class Parser {
                 while (match(OR)){
                     formulas.add(formula(false));
                 }
-                return new Formula.ORList(formulas, connectives);
+                return new Formula.Or(formulas, connectives);
             }
         }
         return term;

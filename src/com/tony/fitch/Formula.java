@@ -5,11 +5,14 @@ import java.util.List;
 abstract class Formula {
   interface Visitor<R> {
     R visitUnaryFormula(Unary formula);
+    R visitNotFormula(Not formula);
     R visitBinaryFormula(Binary formula);
+    R visitImplFormula(Impl formula);
+    R visitBIImplFormula(BIImpl formula);
     R visitQuantifiedFormula(Quantified formula);
     R visitEqualityFormula(Equality formula);
-    R visitANDListFormula(ANDList formula);
-    R visitORListFormula(ORList formula);
+    R visitAndFormula(And formula);
+    R visitOrFormula(Or formula);
     R visitVariableFormula(Variable formula);
     R visitConstantFormula(Constant formula);
     R visitFuncFormula(Func formula);
@@ -29,6 +32,20 @@ abstract class Formula {
     final Formula right;
   }
 
+  static class Not extends Formula {
+    Not(Token operator, Formula right) {
+      this.operator = operator;
+      this.right = right;
+    }
+
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitNotFormula(this);
+    }
+
+    final Token operator;
+    final Formula right;
+  }
+
   static class Binary extends Formula {
     Binary(Formula left, Token connective, Formula right) {
       this.left = left;
@@ -38,6 +55,38 @@ abstract class Formula {
 
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitBinaryFormula(this);
+    }
+
+    final Formula left;
+    final Token connective;
+    final Formula right;
+  }
+
+  static class Impl extends Formula {
+    Impl(Formula left, Token connective, Formula right) {
+      this.left = left;
+      this.connective = connective;
+      this.right = right;
+    }
+
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitImplFormula(this);
+    }
+
+    final Formula left;
+    final Token connective;
+    final Formula right;
+  }
+
+  static class BIImpl extends Formula {
+    BIImpl(Formula left, Token connective, Formula right) {
+      this.left = left;
+      this.connective = connective;
+      this.right = right;
+    }
+
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitBIImplFormula(this);
     }
 
     final Formula left;
@@ -77,28 +126,28 @@ abstract class Formula {
     final Formula right;
   }
 
-  static class ANDList extends Formula {
-    ANDList(List<Formula> terms, List<Token> connectives) {
+  static class And extends Formula {
+    And(List<Formula> terms, List<Token> connectives) {
       this.terms = terms;
       this.connectives = connectives;
     }
 
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitANDListFormula(this);
+      return visitor.visitAndFormula(this);
     }
 
     final List<Formula> terms;
     final List<Token> connectives;
   }
 
-  static class ORList extends Formula {
-    ORList(List<Formula> terms, List<Token> connectives) {
+  static class Or extends Formula {
+    Or(List<Formula> terms, List<Token> connectives) {
       this.terms = terms;
       this.connectives = connectives;
     }
 
     <R> R accept(Visitor<R> visitor) {
-      return visitor.visitORListFormula(this);
+      return visitor.visitOrFormula(this);
     }
 
     final List<Formula> terms;
