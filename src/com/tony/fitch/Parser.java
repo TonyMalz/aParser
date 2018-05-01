@@ -124,8 +124,10 @@ public class Parser {
                 List<Formula> formulas = new ArrayList<>();
                 List<Token> connectives = new ArrayList<>();
                 formulas.add(left);
+                connectives.add(previous());
                 formulas.add(formula(false));
                 while (match(OR)){
+                    connectives.add(previous());
                     formulas.add(formula(false));
                 }
                 consume(RIGHT_PAREN, "Expected ')' after expression.");
@@ -177,8 +179,10 @@ public class Parser {
                 List<Formula> formulas = new ArrayList<>();
                 List<Token> connectives = new ArrayList<>();
                 formulas.add(term);
+                connectives.add(previous());
                 formulas.add(formula(false));
                 while (match(OR)){
+                    connectives.add(previous());
                     formulas.add(formula(false));
                 }
                 return new Formula.Or(formulas, connectives);
